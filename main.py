@@ -8,6 +8,9 @@ class ECC(Gtk.Window):
 		#Call parent constructor to create the Gtk window
 		Gtk.Window.__init__(self,title='Error Control Codes')
 
+		#make it a decent size
+		self.set_default_size(800,500)
+
 		#Create a vertical box to pack widgets into, and a label widget to pack into it
 		self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 		self.result = Gtk.Label('test')
