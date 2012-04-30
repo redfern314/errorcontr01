@@ -13,12 +13,19 @@ class ECC(Gtk.Window):
 
 		#Create a vertical box to pack widgets into, and a label widget to pack into it
 		self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-		self.result = Gtk.Label('test')
+		self.result = Gtk.Label('Enter a word to be transmitted (length<=7):')
+		self.word = Gtk.Entry()
+
+		self.dialogbutton=Gtk.Button('Open Dialog')
 
 		#Pack the label into the box. Syntax: pack_start(widget,expand,fill,padding). pack_end is also a thing.
 		self.vbox.pack_start(self.result,False,True,0)
+		self.vbox.pack_start(self.word,False,False,0)
+		self.vbox.pack_end(self.dialogbutton,False,False,0)
+		self.dialogbutton.connect('clicked',self.opendialog)
 		self.add(self.vbox) #add the box to the window
 
+	def opendialog(self,widget):
 		dialog = ErrorDialog(self)
 		response = dialog.run()
 		dialog.destroy()
