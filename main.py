@@ -56,28 +56,18 @@ class ErrorDialog(Gtk.Dialog):
         
         self.table=Gtk.Table(4,5,True)
         self.labelstart=Gtk.Label('While transmitting your codeword '+'01101'+', magnetic interference created errors within your code.\nSelect which bits to flip:')
-        self.label1=Gtk.Label('0')
-        self.label2=Gtk.Label('1')
-        self.label3=Gtk.Label('1')
-        self.label4=Gtk.Label('0')
-        self.label5=Gtk.Label('1')
         self.labelend=Gtk.Label('New codeword: '+'01101')
-        self.toggle1=Gtk.ToggleButton('Flip')
+        self.toggle1=Gtk.ToggleButton('0')
         self.toggle1.connect('toggled',self.bitflip,1)
-        self.toggle2=Gtk.ToggleButton('Flip')
+        self.toggle2=Gtk.ToggleButton('1')
         self.toggle2.connect('toggled',self.bitflip,2)
-        self.toggle3=Gtk.ToggleButton('Flip')
+        self.toggle3=Gtk.ToggleButton('1')
         self.toggle3.connect('toggled',self.bitflip,3)
-        self.toggle4=Gtk.ToggleButton('Flip')
+        self.toggle4=Gtk.ToggleButton('0')
         self.toggle4.connect('toggled',self.bitflip,4)
-        self.toggle5=Gtk.ToggleButton('Flip')
+        self.toggle5=Gtk.ToggleButton('1')
         self.toggle5.connect('toggled',self.bitflip,5)
         self.table.attach(self.labelstart,0,5,0,1)
-        self.table.attach(self.label1,0,1,1,2)
-        self.table.attach(self.label2,1,2,1,2)
-        self.table.attach(self.label3,2,3,1,2)
-        self.table.attach(self.label4,3,4,1,2)
-        self.table.attach(self.label5,4,5,1,2)
         self.table.attach(self.toggle1,0,1,2,3)
         self.table.attach(self.toggle2,1,2,2,3)
         self.table.attach(self.toggle3,2,3,2,3)
@@ -93,31 +83,31 @@ class ErrorDialog(Gtk.Dialog):
         #if widget.get_active():
         if True:
             if number==1:
-                if self.label1.get_text()=='0':
-                    self.label1.set_text('1')
+                if self.toggle1.get_label()=='0':
+                    self.toggle1.set_label('1')
                 else:
-                    self.label1.set_text('0')
+                    self.toggle1.set_label('0')
             elif number==2:
-                if self.label2.get_text()=='0':
-                    self.label2.set_text('1')
+                if self.toggle2.get_label()=='0':
+                    self.toggle2.set_label('1')
                 else:
-                    self.label2.set_text('0')
+                    self.toggle2.set_label('0')
             elif number==3:
-                if self.label3.get_text()=='0':
-                    self.label3.set_text('1')
+                if self.toggle3.get_label()=='0':
+                    self.toggle3.set_label('1')
                 else:
-                    self.label3.set_text('0')
+                    self.toggle3.set_label('0')
             elif number==4:
-                if self.label4.get_text()=='0':
-                    self.label4.set_text('1')
+                if self.toggle4.get_label()=='0':
+                    self.toggle4.set_label('1')
                 else:
-                    self.label4.set_text('0')
+                    self.toggle4.set_label('0')
             elif number==5:
-                if self.label5.get_text()=='0':
-                    self.label5.set_text('1')
+                if self.toggle5.get_label()=='0':
+                    self.toggle5.set_label('1')
                 else:
-                    self.label5.set_text('0')
-        self.labelend.set_text('New codeword: '+self.label1.get_text()+self.label2.get_text()+self.label3.get_text()+self.label4.get_text()+self.label5.get_text())
+                    self.toggle5.set_label('0')
+        self.labelend.set_text('New codeword: '+self.toggle1.get_label()+self.toggle2.get_label()+self.toggle3.get_label()+self.toggle4.get_label()+self.toggle5.get_label())
 
 #initiate window
 win = ECC()
