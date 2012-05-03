@@ -15,15 +15,27 @@ class ECC(Gtk.Window):
         self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.result = Gtk.Label('Enter a word to be transmitted (length<=7):')
         self.word = Gtk.Entry()
+        self.binaryword = Gtk.Label('')
 
         self.dialogbutton=Gtk.Button('Open Dialog')
+        self.enterbutton=Gtk.Button('Convert my string to binary!')
 
         #Pack the label into the box. Syntax: pack_start(widget,expand,fill,padding). pack_end is also a thing.
         self.vbox.pack_start(self.result,False,True,0)
         self.vbox.pack_start(self.word,False,False,0)
+        self.vbox.pack_start(self.enterbutton,False,False,0)
+        self.vbox.pack_start(self.binaryword,False, False,0)
         self.vbox.pack_end(self.dialogbutton,False,False,0)
         self.dialogbutton.connect('clicked',self.opendialog)
+        self.enterbutton.connect('clicked',self.converttext)
         self.add(self.vbox) #add the box to the window
+
+    def converttext(self,widget):
+        text=self.word.get_text().lower()
+        binary=''
+        for letter in text:
+            binary=binary+bin(ord(letter)-97)[2:].zfill(5)
+        self.binaryword.set_text('Your converted string: '+binary)
 
     def opendialog(self,widget):
         dialog = ErrorDialog(self)
