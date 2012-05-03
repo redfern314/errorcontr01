@@ -28,9 +28,10 @@ class ECC(Gtk.Window):
         self.vbox.pack_end(self.dialogbutton,False,False,0)
         self.dialogbutton.connect('clicked',self.opendialog)
         self.enterbutton.connect('clicked',self.converttext)
+        self.word.connect('key-press-event',self.on_key_press)
         self.add(self.vbox) #add the box to the window
 
-    def converttext(self,widget):
+    def converttext(self,widget=None):
         text=self.word.get_text().lower()
         binary=''
         for letter in text:
@@ -41,6 +42,11 @@ class ECC(Gtk.Window):
         dialog = ErrorDialog(self)
         response = dialog.run()
         dialog.destroy()
+
+    def on_key_press(self,widget,data):
+        val=data.keyval
+        if val==65293:
+            self.converttext()
 
 class ErrorDialog(Gtk.Dialog):
     def __init__(self,parent):
