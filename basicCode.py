@@ -18,7 +18,7 @@ G=([1,0,1,1,1],[0,1,1,0,1])
 #add parity bit to end
 #print G
 c=binary(c*G)
-c[0,0]+=1 #introduce error
+c[0,3]+=1 #introduce error
 c=binary(c)
 
 #Create a dictionary with syndromes as keys and error vectors as values
