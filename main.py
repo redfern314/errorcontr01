@@ -15,14 +15,18 @@ class ECC(Gtk.Window):
 
         #Create a vertical box to pack widgets into, and a label widget to pack into it
         self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.step1 = Gtk.Label('Step 1: Enter a word to be transmitted (length=4):')
+        self.step1 = Gtk.Label('Step 1: Enter a word to be transmitted (length=5):')
         self.word = Gtk.Entry()
         self.binaryword = Gtk.Label('Your converted string: [enter a word]')
 
         self.flipbits=Gtk.Button('Transmit Message')
         self.enterbutton=Gtk.Button('Convert my string to binary!')
         self.encode=Gtk.Button('Encode my message')
-        self.codeword = Gtk.Label('Your encoded message: [press encode]')
+        self.codeword = Gtk.Label('Encoded message: [press encode]')
+        self.received = Gtk.Label('[received message will go here]')
+        self.newmessage = Gtk.Label('Received message: [press decode]')
+        self.decode = Gtk.Button('Decode my message')
+        self.transmit_icon=Gtk.Image.new_from_file('transmit.png')
 
         self.step1box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.step1box.pack_start(self.step1,False,False,0)
@@ -41,6 +45,12 @@ class ECC(Gtk.Window):
         self.step4box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.step4box.pack_start(self.step4,False,False,0)
         self.step4box.pack_start(self.flipbits,False,False,0)
+        self.step5 = Gtk.Label('Step 5: Decode the received message and translate it into text')
+        self.step5box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.step5box.pack_start(self.step5,False,False,0)
+        self.step5box.pack_start(self.received,False,False,0)
+        self.step5box.pack_start(self.decode,False,False,0)
+        self.step5box.pack_start(self.newmessage,False,False,0)
 
         self.frame1 = Gtk.Frame()
         self.frame1.add(self.step1box)
@@ -50,23 +60,18 @@ class ECC(Gtk.Window):
         self.frame3.add(self.step3box)
         self.frame4 = Gtk.Frame()
         self.frame4.add(self.step4box)
+        self.frame5 = Gtk.Frame()
+        self.frame5.add(self.step5box)
 
         #Pack the label into the box. Syntax: pack_start(widget,expand,fill,padding). pack_end is also a thing.
-        '''
-        self.vbox.pack_start(self.step1,False,True,0)
-        self.vbox.pack_start(self.word,False,False,0)
-        self.vbox.pack_start(self.enterbutton,False,False,0)
-        self.vbox.pack_start(self.binaryword,False,False,0)
-        self.vbox.pack_start(self.encode,False,False,0)
-        self.vbox.pack_start(self.codeword,False,False,0)
-        self.vbox.pack_start(self.flipbits,False,False,0)'''
         self.vbox.pack_start(self.frame1,False,False,0)
         self.vbox.pack_start(self.frame2,False,False,0)
         self.vbox.pack_start(self.frame3,False,False,0)
         self.vbox.pack_start(self.frame4,False,False,0)
-        self.flipbits.connect('clicked',self.opendialog)
+        self.flipbits.connect('clicked',self.transmit)
         self.enterbutton.connect('clicked',self.converttext)
         self.encode.connect('clicked',self.generatecode)
+        self.decode.connect('clicked',self.decodeText)
         self.word.connect('key-press-event',self.on_key_press)
         self.add(self.vbox) #add the box to the window
 
@@ -81,8 +86,10 @@ class ECC(Gtk.Window):
             self.binaryword.set_text('Your converted string: [enter a word]')
 
     def generatecode(self,widget=None):
-        message=self.binaryword.get_text()[23:]
-        #Corrects the error vector
+        message=self.stringToMatrix(self.binaryword.get_text()[23:])
+        codeword=getCodeword(message)
+        self.codeword.set_text('Encoded message: '+self.matrixToString(codeword))
+        '''
         m=mat([1,0]) 
         print "The original message is:"
         print m
@@ -96,26 +103,58 @@ class ECC(Gtk.Window):
         print "The error is:"
         print e
         print "The codeword after error correction is:"
-        print e+c
+        print e+c'''
 
+    def decodeText(self,widget=None):
+        received=self.stringToMatrix(self.received.get_text()[19:])
+        error=getError(received)
+        print "The error is:"
+        print error
+        print "The codeword after error correction is:"
+        print binary(error+received)
+        correct=binary(error+received)
+        decoded=self.matrixToString(correct)[:25]
+        word=''
+        for i in range(len(decoded)/5):
+            word = word + chr(int('0b'+decoded[i*5:i*5+5],2)+97)
+        self.newmessage.set_text('Received message: '+word)
 
+    def stringToMatrix(self,string):
+        #pre: a string is passed to the function
+        #post: a 1xN matrix is returned
+        for i in range(len(string)-1):
+            string=string[:2*i+1]+','+string[2*i+1:]
+        return matrix(string)
 
-    def opendialog(self,widget):
-        dialog = ErrorDialog(self,self.binaryword.get_text()[23:])
+    def matrixToString(self,matrix):
+        #pre: a 1xN matrix is passed to the function
+        #post: a string is returned
+        newstr=''
+        for i in range(matrix[0,:].size):
+            newstr=newstr+str(int(matrix[0,i]))
+        print newstr
+        return newstr
+
+    def transmit(self,widget):
+        dialog = ErrorDialog(self,self.codeword.get_text()[17:])
         response = dialog.run()
+        received=dialog.labelend.get_text()[14:]
         dialog.destroy()
+        self.vbox.pack_start(self.transmit_icon,False,False,0)
+        self.vbox.pack_start(self.frame5,False,False,0)
+        self.received.set_text('Received codeword: '+received)
+        self.show_all()
 
     def on_key_press(self,widget,data):
         val=data.keyval
         if val==65288:
             return False
+        elif val==65293 and len(self.word.get_text())<=5:
+            self.converttext()
         elif len(self.word.get_text())>=5:
             return True
-        elif val==65293:
-            self.converttext()
         elif not(val<=122 and val>=65):
             return True
-
 
 class ErrorDialog(Gtk.Dialog):
     def __init__(self,parent,codeword):

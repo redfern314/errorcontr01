@@ -49,6 +49,9 @@ def generate_ldpc(rows,columns):
                     rowones[templist[randrow],0]+=1
             templist=[]
 
+    #ident=matrix(eye(rows))
+    #ldpc=concatenate((ident,ldpc),1)
+    savetxt('pmatrix.txt',ldpc)
     print ldpc
     print rowones
     return ldpc
