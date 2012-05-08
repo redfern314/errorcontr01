@@ -1,5 +1,6 @@
 from numpy import *
 import pdb
+from mathCode import *
 
 def generate_ldpc(rows,columns):
     #create a matrix of all zeros
@@ -56,4 +57,33 @@ def generate_ldpc(rows,columns):
     print rowones
     return ldpc
 
-generate_ldpc(25,25)
+def stdForm(H):
+    print shape(H)
+    [n,q]=shape(H)
+    #need n*n matrix to be identity
+
+    #make sure that the diagonal has all ones
+    for i in range(n):
+        if H[i,i]==0:
+            for j in range(n):
+                if H[j,i]==1:
+                    H[i,:]=H[j,:]
+    print "No 0's?"
+    #print H               
+
+    #make left side all zeros
+    for i in range(n):#go through columns
+        for j in range(i+1,n):#go through each row in column that is less than the column number
+            if H[j,i]==1:
+                H[j,:]=binary(H[j,:]+H[i,:])
+    #make right side all zeros
+    #for i in range(n,0): #go through columns
+        #for j in range(n,i-1): #go through each row in column
+            #if H[j,i]==1:
+                #H[j,:]=H[i,:]   
+    return H
+
+
+H=generate_ldpc(7,14)
+H=stdForm(H)
+print H
