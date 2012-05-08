@@ -3,6 +3,10 @@ from gi.repository import Gtk, Gdk, GObject
 from mathCode import *
 import pdb
 
+##TODOS before expo
+##Control program flow by greying out buttons
+##Create reset button
+
 class ECC(Gtk.Window):
 
     #Called when new class instance is created
@@ -113,7 +117,7 @@ class ECC(Gtk.Window):
         print "The codeword after error correction is:"
         print binary(error+received)
         correct=binary(error+received)
-        decoded=self.matrixToString(correct)[:25]
+        decoded=self.matrixToString(correct)[25:]
         word=''
         for i in range(len(decoded)/5):
             word = word + chr(int('0b'+decoded[i*5:i*5+5],2)+97)
