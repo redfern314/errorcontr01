@@ -9,7 +9,7 @@ def generate_ldpc(rows,columns):
 
     #place 5 randoms 1s in each column
     for i in range(columns):
-        for j in range(5):
+        for j in range(3):
             randrow=int(random.random()*rows)
             while ldpc[randrow,i]==1:
                 randrow=int(random.random()*rows)
@@ -63,11 +63,20 @@ def stdForm(H):
     #need n*n matrix to be identity
 
     #make sure that the diagonal has all ones
+    #i iterates columns, j iterates rows
     for i in range(n):
         if H[i,i]==0:
             for j in range(n):
-                if H[j,i]==1:
-                    H[i,:]=H[j,:]
+                if H[j,i]==1 and j>i:
+                    H[i,:]=binary(H[i,:]+H[j,:])
+                    #pdb.set_trace()
+                    break
+        for j in range(n):
+            #pdb.set_trace()
+            if H[j,i]==1 and (not j==i):
+                H[j,:]=binary(H[i,:]+H[j,:])
+                #pdb.set_trace()
+
     print "No 0's?"
     #print H               
 
