@@ -50,8 +50,6 @@ def generate_ldpc(rows,columns):
                     rowones[templist[randrow],0]+=1
             templist=[]
 
-    #ident=matrix(eye(rows))
-    #ldpc=concatenate((ident,ldpc),1)
     savetxt('pmatrix.txt',ldpc)
     print ldpc
     print rowones
@@ -74,25 +72,9 @@ def stdForm(H):
                     #pdb.set_trace()
                     break
         for j in range(n):
-            #pdb.set_trace()
             if H[j,i]==1 and (not j==i):
                 H[j,:]=binary(H[i,:]+H[j,:])
                 rowops.append((j,i))
-                #pdb.set_trace()
-    print rowops
-    print "No 0's?"
-    #print H               
-    '''
-    #make left side all zeros
-    for i in range(n):#go through columns
-        for j in range(i+1,n):#go through each row in column that is less than the column number
-            if H[j,i]==1:
-                H[j,:]=binary(H[j,:]+H[i,:])
-    #make right side all zeros
-    #for i in range(n,0): #go through columns
-        #for j in range(n,i-1): #go through each row in column
-            #if H[j,i]==1:
-                #H[j,:]=H[i,:]   '''
     return [H,rowops]
 
 def unStdForm(G,rowops):
@@ -104,12 +86,7 @@ count=0
 H=matrix([0,1])
 while not(equal(H[:,0:shape(H)[1]/2],eye(shape(H)[1]/2)).all()==True):
     H=generate_ldpc(25,50)
-
-    #pdb.set_trace()
-    #H=matrix([[1,1,0,1,1,0,0,1,0,0],[0,1,1,0,1,1,1,0,0,0],[0,0,0,1,0,0,0,1,1,1],[1,1,0,0,0,1,1,0,1,0],[0,0,1,0,0,1,0,1,0,1]])
-    print H
     [stdH,rowops]=stdForm(H)
-    print stdH
     H=stdH
     count+=1
     print count

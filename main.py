@@ -94,21 +94,6 @@ class ECC(Gtk.Window):
         message=self.stringToMatrix(self.binaryword.get_text()[23:])
         codeword=getCodeword(message)
         self.codeword.set_text('Encoded message: '+self.matrixToString(codeword))
-        '''
-        m=mat([1,0]) 
-        print "The original message is:"
-        print m
-        c=getCodeword(m)
-        print "The encoded message before errors is:"
-        print c
-        c[0,0]=0#introduce error
-        print "The code after an error is introduced is:"
-        print c
-        e=getError(c)
-        print "The error is:"
-        print e
-        print "The codeword after error correction is:"
-        print e+c'''
 
     def decodeText(self,widget=None):
         received=self.stringToMatrix(self.received.get_text()[19:])
@@ -163,8 +148,6 @@ class ECC(Gtk.Window):
 
 class ErrorDialog(Gtk.Dialog):
     def __init__(self,parent,codeword):
-        #Gtk.Dialog.__init__(self, "Search", parent,Gtk.DialogFlags.MODAL, buttons=(Gtk.STOCK_FIND, Gtk.ResponseType.OK,Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
-
         Gtk.Dialog.__init__(self, flags=Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT, title="My Dialog", parent=parent, buttons=(Gtk.STOCK_OK, Gtk.ResponseType.OK))
         
         self.toggle=[]
@@ -194,7 +177,6 @@ class ErrorDialog(Gtk.Dialog):
         self.show_all()
 
     def bitflip(self,widget,number):
-        #if widget.get_active():
         if True:
             if self.toggle[number].get_label()=='0':
                 self.toggle[number].set_label('1')
