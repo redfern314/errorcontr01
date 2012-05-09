@@ -28,7 +28,6 @@ def getCodeword(c):
     #G=([1,0,1,1,1],[0,1,1,0,1])
     #add parity bit to end
     #print G
-    pdb.set_trace()
     c=binary(c*G)
     #c[0,3]+=1 #introduce error
     print c
@@ -43,7 +42,6 @@ def getMessage(r):
     ldpc=genfromtxt("gmatrix.txt")
     #G=concatenate((ldpc,ident),1)
     c=binary(r*linalg.inv(transpose(ldpc)))
-    pdb.set_trace()
 
 
 def getH_T():
@@ -56,17 +54,58 @@ def getH_T():
 
 #Create a dictionary with syndromes as keys and error vectors as values
 def getSyndromeTable():
-    errors=matrix(concatenate((zeros((1,50)),eye(50)),0))
-    syndromes=errors*getH_T()
+    errors=getErrorMatrix()
+    syndromes=binarymatrix(errors*getH_T())
     lookup={}
-    for i in range(shape(errors)[1]):
+    for i in range(shape(errors)[0]):
         strsyn=''
         for j in range(shape(syndromes[i])[1]):
-            strsyn=strsyn+str(int(syndromes[i][0,j]))
+            strsyn=strsyn+str(int(syndromes[i,j]))
         if strsyn in lookup:
             print strsyn + ' is a duplicate syndrome - time to revise the code!'
-        lookup[strsyn]=errors[i]
+        lookup[strsyn]=errors[i,:]
+        print strsyn, lookup[strsyn]
     return lookup
+
+def getErrorMatrix():
+    errors=matrix(concatenate((zeros((1,50)),eye(50)),0))
+    errors=matrix(zeros((1,50)))
+    errorlist=[]
+    allzeros=matrix(zeros((1,50)))
+    errorlist.append(errors)
+    #loop through 1 error
+    for i in range(50):
+        currerr=matrix(zeros((1,50)))
+        currerr[0,i]=1
+        errors=matrix(concatenate((errors,currerr),0))
+        errorlist.append(errors)
+
+    #loop through 2 errors
+    for i in range(50):
+        for j in range(50-i-1):
+            j+=(i+1)
+            currerr=matrix(zeros((1,50)))
+            currerr[0,i]=1
+            currerr[0,j]=1
+            errors=matrix(concatenate((errors,currerr),0))
+            errorlist.append(errors)
+            print currerr
+    '''
+    #loop through 3 errors
+    for i in range(50):
+        for j in range(50-i-1):
+            j+=(i+1)
+            for k in range(50-j-1):
+                k+=j+1
+                currerr=matrix(zeros((1,50)))
+                currerr[0,i]=1
+                currerr[0,j]=1
+                currerr[0,k]=1
+                errors=matrix(concatenate((errors,currerr),0))
+                errorlist.append(errors)
+                print currerr
+    pdb.set_trace()'''
+    return errors
 
 #Compute syndrome for received codeword
 def isValidCodeword(c):
@@ -87,8 +126,6 @@ def getError(c):
     errsyn=''
     for j in range(shape(c*getH_T())[1]):
         errsyn=errsyn+str(int((c*getH_T())[0,j])%2)
-    #pdb.set_trace()
-    #print errsyn
     lookup=getSyndromeTable()
     if errsyn in lookup:
         errvec=lookup[errsyn]
@@ -116,18 +153,21 @@ print "The error is:"
 print e
 print "The codeword after error correction is:"
 print binary(e+c)'''
-'''
+
+
 m=matrix([0,1,1,0,1,1,1,0,0,1,1,0,1,0,1,1,1,1,0,0,1,0,1,0,0])
 c=getCodeword(m)
 print 'Codeword:'
 print c
-c[0,2]+=1
+c[0,48]+=1
+c[0,49]+=1
 c=binary(c)
 print 'Received:'
 print c
+pdb.set_trace()
 e=getError(c)
 print 'Error:'
 print e
 print "The codeword after error correction is:"
 print binary(e+c)
-print 'Received message: ',binary(e+c)[0,25:50]'''
+print 'Received message: ',binary(e+c)[0,25:50]

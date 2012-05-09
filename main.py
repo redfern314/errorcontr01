@@ -6,6 +6,7 @@ import pdb
 ##TODOS before expo
 ##Control program flow by greying out buttons
 ##Create reset button
+##Speed up program by storing error and syndrome tables
 
 class ECC(Gtk.Window):
 
