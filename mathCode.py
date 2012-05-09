@@ -12,45 +12,19 @@ def binarymatrix(A):
         A[i,:]=binary(A[i,:])
     return A
 
-#a=mat(["1 2; 3 4"]) #could also do mat([1.,2.],[3.,4.])
-
 #Define message and generator matrix
+
 #Generate codeword
 def getCodeword(c):
-    #c=mat([1,0]) #one letter codeword
-    #print "The original codeword is:"
-    #print c
-    #c=matrix(zeros((1,25)))
     ident=matrix(eye(25))
     ldpc=genfromtxt("gmatrix.txt")
     G=ldpc
-    #G=concatenate((ident,transpose(ldpc)),1)
-    #G=([1,0,1,1,1],[0,1,1,0,1])
-    #add parity bit to end
-    #print G
     c=binary(c*G)
-    #c[0,3]+=1 #introduce error
-    print c
-    c=binary(c)
     return c
 
-#takes a received message and outputs original codeword
-#DO NOT USE
-#NOT GOOD
-def getMessage(r):
-    #ident=matrix(eye(5))
-    ldpc=genfromtxt("gmatrix.txt")
-    #G=concatenate((ldpc,ident),1)
-    c=binary(r*linalg.inv(transpose(ldpc)))
-
-
 def getH_T():
-    #H_T=matrix([[1,1,1],[1,0,1],[1,0,0],[0,1,0],[0,0,1]])
     ldpc=matrix(transpose(genfromtxt("hmatrix.txt")))
     return ldpc
-    #ident=matrix(eye(5))
-    #H_T=transpose(concatenate((ident,ldpc),1))
-    #return H_T
 
 #Create a dictionary with syndromes as keys and error vectors as values
 def getSyndromeTable():
@@ -109,11 +83,8 @@ def getErrorMatrix():
 
 #Compute syndrome for received codeword
 def isValidCodeword(c):
-    #print "The encoding is:"
-    #print c
     valid = c*getH_T()
     valid=binary(valid)
-    #print valid
     if valid.all()==0:
         return True
         #print "valid codeword"
@@ -134,26 +105,6 @@ def getError(c):
     else:
         print 'not found'
         return zeros(shape(c))
-#Corrects the error vector
-'''
-m=matrix([1,0,0,1,0,1]) 
-print "The original message is:"
-print m
-c=getCodeword(m)
-print "The encoded message before errors is:"
-print c
-print binary(c*getH_T())
-c[0,5]+=1
-c=binary(c)#introduce error
-print "The code after an error is introduced is:"
-print c
-#pdb.set_trace()
-e=getError(c)
-print "The error is:"
-print e
-print "The codeword after error correction is:"
-print binary(e+c)'''
-
 
 m=matrix([0,1,1,0,1,1,1,0,0,1,1,0,1,0,1,1,1,1,0,0,1,0,1,0,0])
 c=getCodeword(m)
