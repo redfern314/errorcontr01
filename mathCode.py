@@ -1,5 +1,6 @@
 from numpy import *
 import pdb
+import pickle
 
 def binary(code):
     for i in range(code.size):
@@ -27,7 +28,7 @@ def getH_T():
     return ldpc
 
 #Create a dictionary with syndromes as keys and error vectors as values
-def getSyndromeTable():
+def generateSyndromeTable():
     errors=getErrorMatrix()
     syndromes=binarymatrix(errors*getH_T())
     lookup={}
@@ -39,20 +40,27 @@ def getSyndromeTable():
             print strsyn + ' is a duplicate syndrome - time to revise the code!'
         lookup[strsyn]=errors[i,:]
         print strsyn, lookup[strsyn]
-    return lookup
+    f=open('syndromes.txt','w')
+    pickle.dump(lookup, f)
 
-def getErrorMatrix():
+def getSyndromeTable():
+    f=open('syndromes.txt','r')
+    syndromes=pickle.load(f)
+    return syndromes
+
+def generateErrorMatrix():
     errors=matrix(concatenate((zeros((1,50)),eye(50)),0))
     errors=matrix(zeros((1,50)))
     errorlist=[]
     allzeros=matrix(zeros((1,50)))
-    errorlist.append(errors)
+    print 'starting'
+    #errorlist.append(errors)
     #loop through 1 error
     for i in range(50):
         currerr=matrix(zeros((1,50)))
         currerr[0,i]=1
         errors=matrix(concatenate((errors,currerr),0))
-        errorlist.append(errors)
+        #errorlist.append(errors)
 
     #loop through 2 errors
     for i in range(50):
@@ -62,11 +70,10 @@ def getErrorMatrix():
             currerr[0,i]=1
             currerr[0,j]=1
             errors=matrix(concatenate((errors,currerr),0))
-            errorlist.append(errors)
-            print currerr
-    '''
+    
     #loop through 3 errors
     for i in range(50):
+        print i
         for j in range(50-i-1):
             j+=(i+1)
             for k in range(50-j-1):
@@ -76,10 +83,31 @@ def getErrorMatrix():
                 currerr[0,j]=1
                 currerr[0,k]=1
                 errors=matrix(concatenate((errors,currerr),0))
-                errorlist.append(errors)
-                print currerr
-    pdb.set_trace()'''
-    return errors
+    '''
+    #loop through 4 errors
+    for i in range(50):
+        print i
+        for j in range(50-i-1):
+            print j
+            j+=(i+1)
+            for k in range(50-j-1):
+                k+=(j+1)
+                for l in range(50-k-1):
+                    l+=(k+1)
+                    currerr=matrix(zeros((1,50)))
+                    currerr[0,i]=1
+                    currerr[0,j]=1
+                    currerr[0,k]=1
+                    currerr[0,l]=1
+                    errors=matrix(concatenate((errors,currerr),0))'''
+
+    #pdb.set_trace()
+    print 'finished'
+    savetxt('errormat.txt',errors)
+
+def getErrorMatrix():
+    errors=genfromtxt("errormat.txt")
+    return matrix(errors)
 
 #Compute syndrome for received codeword
 def isValidCodeword(c):
@@ -105,7 +133,7 @@ def getError(c):
     else:
         print 'not found'
         return zeros(shape(c))
-
+'''
 m=matrix([0,1,1,0,1,1,1,0,0,1,1,0,1,0,1,1,1,1,0,0,1,0,1,0,0])
 c=getCodeword(m)
 print 'Codeword:'
@@ -122,3 +150,6 @@ print e
 print "The codeword after error correction is:"
 print binary(e+c)
 print 'Received message: ',binary(e+c)[0,25:50]
+'''
+#generateErrorMatrix()
+#generateSyndromeTable()

@@ -82,6 +82,7 @@ def unStdForm(G,rowops):
         G[op[0],:]=binary(G[op[0],:]+G[op[1],:])
     return G
 
+'''
 count=0
 H=matrix([0,1])
 while not(equal(H[:,0:shape(H)[1]/2],eye(shape(H)[1]/2)).all()==True):
@@ -104,4 +105,4 @@ print 'Un-std form G:'
 print G
 print stdH
 print binarymatrix(H*transpose(G))
-savetxt('hmatrix.txt',H)
+savetxt('hmatrix.txt',H)'''

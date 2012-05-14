@@ -22,16 +22,21 @@ class ECC(Gtk.Window):
         self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.step1 = Gtk.Label('Step 1: Enter a word to be transmitted (length=5):')
         self.word = Gtk.Entry()
+        self.word.connect('changed',self.wordchanged)
         self.binaryword = Gtk.Label('Your converted string: [enter a word]')
 
         self.flipbits=Gtk.Button('Transmit Message')
+        self.flipbits.set_sensitive(False)
         self.enterbutton=Gtk.Button('Convert my string to binary!')
+        self.enterbutton.set_sensitive(False)
         self.encode=Gtk.Button('Encode my message')
+        self.encode.set_sensitive(False)
         self.codeword = Gtk.Label('Encoded message: [press encode]')
         self.received = Gtk.Label('[received message will go here]')
         self.newmessage = Gtk.Label('Received message: [press decode]')
         self.decode = Gtk.Button('Decode my message')
         self.transmit_icon=Gtk.Image.new_from_file('transmit.png')
+        self.reset = Gtk.Button('Reset Application')
 
         self.step1box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.step1box.pack_start(self.step1,False,False,0)
@@ -73,12 +78,38 @@ class ECC(Gtk.Window):
         self.vbox.pack_start(self.frame2,False,False,0)
         self.vbox.pack_start(self.frame3,False,False,0)
         self.vbox.pack_start(self.frame4,False,False,0)
+        self.vbox.pack_start(self.reset,False,False,0)
         self.flipbits.connect('clicked',self.transmit)
         self.enterbutton.connect('clicked',self.converttext)
         self.encode.connect('clicked',self.generatecode)
         self.decode.connect('clicked',self.decodeText)
         self.word.connect('key-press-event',self.on_key_press)
+        self.reset.connect('clicked',self.resetapp)
         self.add(self.vbox) #add the box to the window
+
+    def resetapp(self,widget=None):
+        try:
+            self.vbox.remove(self.transmit_icon)
+            self.vbox.remove(self.frame5)
+        except:
+            pass
+        self.word.set_sensitive(True)
+        self.enterbutton.set_sensitive(False)
+        self.encode.set_sensitive(False)
+        self.flipbits.set_sensitive(False)
+        self.word.set_text('')
+        self.codeword.set_text('Encoded message: [press encode]')
+        self.received.set_text('[received message will go here]')
+        self.newmessage.set_text('Received message: [press decode]')
+        self.binaryword.set_text('Your converted string: [enter a word]')
+        
+
+    def wordchanged(self,widget=None):
+        if len(self.word.get_text())==5:
+            self.enterbutton.set_sensitive(True)
+        else:
+            self.enterbutton.set_sensitive(False)
+
 
     def converttext(self,widget=None):
         text=self.word.get_text().lower()
@@ -87,21 +118,28 @@ class ECC(Gtk.Window):
             for letter in text:
                 binary=binary+bin(ord(letter)-97)[2:].zfill(5)
             self.binaryword.set_text('Your converted string: '+binary)
+            self.encode.set_sensitive(True)
+            self.enterbutton.set_sensitive(False)
+            self.word.set_sensitive(False)
         else:
             self.binaryword.set_text('Your converted string: [enter a word]')
+            self.encode.set_sensitive(False)
 
     def generatecode(self,widget=None):
         message=self.stringToMatrix(self.binaryword.get_text()[23:])
         codeword=getCodeword(message)
         self.codeword.set_text('Encoded message: '+self.matrixToString(codeword))
+        self.encode.set_sensitive(False)
+        self.flipbits.set_sensitive(True)
 
     def decodeText(self,widget=None):
+        self.decode.set_sensitive(False)
         received=self.stringToMatrix(self.received.get_text()[19:])
         error=getError(received)
-        print "The error is:"
-        print error
-        print "The codeword after error correction is:"
-        print binary(error+received)
+        #print "The error is:"
+        #print error
+        #print "The codeword after error correction is:"
+        #print binary(error+received)
         correct=binary(error+received)
         decoded=self.matrixToString(correct)[25:]
         word=''
@@ -122,16 +160,25 @@ class ECC(Gtk.Window):
         newstr=''
         for i in range(matrix[0,:].size):
             newstr=newstr+str(int(matrix[0,i]))
-        print newstr
+        #print newstr
         return newstr
 
     def transmit(self,widget):
+        self.flipbits.set_sensitive(False)
         dialog = ErrorDialog(self,self.codeword.get_text()[17:])
         response = dialog.run()
         received=dialog.labelend.get_text()[14:]
         dialog.destroy()
+        try:
+            self.vbox.remove(self.transmit_icon)
+            self.vbox.remove(self.frame5)
+        except:
+            pass
+        self.vbox.remove(self.reset)
+        self.decode.set_sensitive(True)
         self.vbox.pack_start(self.transmit_icon,False,False,0)
         self.vbox.pack_start(self.frame5,False,False,0)
+        self.vbox.pack_start(self.reset,False,False,0)
         self.received.set_text('Received codeword: '+received)
         self.show_all()
 
@@ -139,7 +186,7 @@ class ECC(Gtk.Window):
         val=data.keyval
         if val==65288:
             return False
-        elif val==65293 and len(self.word.get_text())<=5:
+        elif val==65293 and len(self.word.get_text())==5:
             self.converttext()
         elif len(self.word.get_text())>=5:
             return True
